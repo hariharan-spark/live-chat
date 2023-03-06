@@ -14,7 +14,29 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">S.No</th>
+                            <th scope="col">User Name</th>
+                            <th scope="col">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+
+                        @if(isset($users))
+                            @foreach($users as $user)
+                            <tr>
+                                <th scope="row">{{$loop->index+1}}</th>
+                                <td>{{$user->name}}</td>
+                                <td><a href="/chat/{{$user->id}}">chat</a></td>
+                            </tr>
+                          @endforeach
+                        @endif
+                        </tbody>
+                      </table>
+                    
                 </div>
             </div>
         </div>

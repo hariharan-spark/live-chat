@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -11,8 +14,10 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(User $user,Chat $chat)
     {
+        $this->user = $user;
+        $this->chat = $chat;
         $this->middleware('auth');
     }
 
@@ -23,6 +28,29 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $id=Auth::id();
+        $users=$this->user->where('id','!=',$id)->get();
+        return view('home',compact('users'));
     }
+
+
+    public function chat($id)
+    {
+        $fromId = Auth::user();
+        $toId = $this->user->where('id',$id)->select('id','name')->first();
+        $from = $fromId->id;
+        $to = $toId->id;
+        $chats = $this->chat->where(function ($query) use ($from,$to) {
+            $query->where('from_id', '=', $from)
+                  ->where('to_id', '=', $to);
+        })
+        ->orWhere(function ($query) use ($from,$to) {
+            $query->where('from_id', '=', $to)
+                  ->where('to_id', '=', $from);
+        })->get();
+        return view('chat',compact('fromId','toId','chats'));
+    }
+
+
+
 }
